@@ -10,6 +10,7 @@ public class PlayerMovement : MonoBehaviour
     private float moveSpeed = 7f;
     private float jumpForce = 14f;
 
+
     // Start is called before the first frame update
     void Start()
     {
@@ -21,10 +22,10 @@ public class PlayerMovement : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
-        float dirX = Input.GetAxisRaw(MovingConstants.Horizontal);
+        float dirX = Input.GetAxisRaw("Horizontal");
         characterBody.velocity = new Vector2(dirX * moveSpeed, characterBody.velocity.y);
 
-        if (Input.GetButtonDown(MovingConstants.Jump))
+        if (Input.GetButtonDown("Jump"))
         {
             characterBody.velocity = new Vector2(characterBody.velocity.x, jumpForce);
         }
@@ -35,20 +36,35 @@ public class PlayerMovement : MonoBehaviour
 
     private void UpdateAnimationState(float dirX)
     {
+        MovementState state;
+
         if (dirX > 0f)
         {
-            anim.SetBool(MovingConstants.Running, true);
+            state = MovementState.running;
             sprite.flipX = false;
         }
         else if (dirX < 0f)
         {
-            anim.SetBool(MovingConstants.Running, true);
+            state = MovementState.running;
+
             sprite.flipX = true;
         }
         else
         {
-            anim.SetBool(MovingConstants.Running, false);
+            state = MovementState.idle;
+
         }
+
+        if(characterBody.velocity.y > .1f)
+        {
+            state = MovementState.jumping;
+        }
+        else if (characterBody.velocity.y < -.1f)
+        {
+            state = MovementState.falling;
+        }
+
+        anim.SetInteger("movementState", (int)state);
     }
 }
 
